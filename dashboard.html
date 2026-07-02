@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-5xl mx-auto flex justify-between items-center p-5">
+
+            <h1 class="text-3xl font-bold text-blue-600">
+                TaskFlow
+            </h1>
+
+            <button class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition">
+                Logout
+            </button>
+
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+
+    <div class="max-w-5xl mx-auto p-6">
+
+        <!-- Welcome -->
+
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+
+            <h2 class="text-3xl font-bold">
+                Welcome Back 👋
+            </h2>
+
+            <p class="text-gray-500 mt-2">
+                Stay organized and manage your daily tasks.
+            </p>
+
+        </div>
+
+        <!-- Add Task -->
+
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <div id="detail"></div>
+            <h3 class="text-xl font-semibold mb-4">
+                Add New Task
+            </h3>
+
+            <div class="flex gap-4 md:flex-row flex-col">
+
+                <input id="input-task" type="text" placeholder="Enter your task..."
+                    class="flex-1 border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500">
+
+                <button id="add-btn" class="bg-blue-600 text-white px-6 rounded-lg hover:bg-blue-700 transition">
+                    Add Task
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- Summary -->
+
+        <div class="grid md:grid-cols-3 gap-5 mb-6">
+
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+
+                <h3 class="text-gray-500">
+                    Total Tasks
+                </h3>
+
+                <p id="total-task" class="text-4xl font-bold text-blue-600 mt-2">
+                    0
+                </p>
+
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+
+                <h3 class="text-gray-500">
+                    Pending
+                </h3>
+
+                <p id="pending-task" class="text-4xl font-bold text-orange-500 mt-2">
+                    0
+                </p>
+
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+
+                <h3 class="text-gray-500">
+                    Completed
+                </h3>
+
+                <p id="completed-task" class="text-4xl font-bold text-green-500 mt-2">
+                    0
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- Task List -->
+
+        <div class="bg-white rounded-xl shadow-md p-6">
+
+            <h3 class="text-xl font-semibold mb-5">
+                My Tasks
+            </h3>
+
+            <ul id="list" class="space-y-3">
+
+            </ul>
+        </div>
+
+</body>
+<script>
+    const inputtask = document.querySelector("#input-task");
+    const addbtn = document.querySelector("#add-btn");
+    const totaltask = document.querySelector("#total-task");
+    const pendingtask = document.querySelector("#pending-task");
+    const completedtask = document.querySelector("#completed-task");
+    const list = document.querySelector("#list");
+    const detail = document.querySelector("#detail");
+
+    // Counters (Global)
+    let total = 0;
+    let pending = 0;
+    let completed = 0;
+
+    // Remove error message on focus
+    inputtask.addEventListener("focus", () => {
+        detail.innerHTML = "";
+    });
+
+    // Add Task
+    addbtn.addEventListener("click", () => {
+
+        let input = inputtask.value.trim();
+
+        if (input === "") {
+            detail.innerHTML = "";
+
+            let p = document.createElement("p");
+            p.innerText = "Please enter a task!";
+            p.className = "bg-red-200 text-red-600 p-2 rounded";
+            detail.appendChild(p);
+            return;
+        }
+
+        // Update counters
+        total++;
+        pending++;
+
+        totaltask.innerText = total;
+        pendingtask.innerText = pending;
+
+        // Create li
+        let li = document.createElement("li");
+        li.className = "p-2 flex justify-between items-center border rounded-lg";
+
+        // Left div
+        let left = document.createElement("div");
+        left.className = "flex items-center gap-3";
+
+        // Checkbox
+        let checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+
+        // Task Text
+        let span = document.createElement("span");
+        span.innerText = input;
+
+        left.appendChild(checkbox);
+        left.appendChild(span);
+
+        li.appendChild(left);
+
+        // Delete Button
+        let delbtn = document.createElement("button");
+        delbtn.innerText = "🗑";
+        delbtn.className = "text-red-500 hover:text-red-700";
+
+        li.appendChild(delbtn);
+
+        list.appendChild(li);
+
+        // Clear input
+        inputtask.value = "";
+
+        // Checkbox Event
+        checkbox.addEventListener("change", () => {
+
+            if (checkbox.checked) {
+
+                completed++;
+                pending--;
+
+                span.style.textDecoration = "line-through";
+                span.style.color = "gray";
+
+            } else {
+
+                completed--;
+                pending++;
+
+                span.style.textDecoration = "none";
+                span.style.color = "black";
+
+            }
+
+            completedtask.innerText = completed;
+            pendingtask.innerText = pending;
+
+        });
+
+        // Delete Event
+        delbtn.addEventListener("click", () => {
+
+            total--;
+
+            if (checkbox.checked) {
+                completed--;
+            } else {
+                pending--;
+            }
+
+            totaltask.innerText = total;
+            pendingtask.innerText = pending;
+            completedtask.innerText = completed;
+
+            li.remove();
+
+        });
+
+    }); </script>
+
+</html>
